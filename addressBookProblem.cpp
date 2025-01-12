@@ -4,7 +4,7 @@
 using namespace std;
 
 class Contacts {
-public :
+public:
     string firstName;
     string lastName;
     string address;
@@ -25,19 +25,17 @@ public :
         this->email = email;
     }
 
-    Contacts() {
-    }
+    Contacts() {}
 
-public:
     void display() {
-        cout << "First Name : " << firstName << endl;
-        cout << "Last Name : " << lastName << endl;
-        cout << "Address : " << address << endl;
-        cout << "City : " << city << endl;
-        cout << "State : " << state << endl;
-        cout << "Zip : " << zip << endl;
-        cout << "Phone Number : " << phoneNumber << endl;    
-        cout << "Email : " << email << endl;
+        cout << "First Name: " << firstName << endl;
+        cout << "Last Name: " << lastName << endl;
+        cout << "Address: " << address << endl;
+        cout << "City: " << city << endl;
+        cout << "State: " << state << endl;
+        cout << "Zip: " << zip << endl;
+        cout << "Phone Number: " << phoneNumber << endl;
+        cout << "Email: " << email << endl;
     }
 
     void input() {
@@ -45,13 +43,12 @@ public:
         cin >> firstName;
         cout << "Enter Last Name: ";
         cin >> lastName;
-        cout << "Enter Address : ";
-        cin >> address;
+        cout << "Enter Address: ";
         cin.ignore();
         getline(cin, address);
-        cout << "Enter City : ";
+        cout << "Enter City: ";
         cin >> city;
-        cout << "Enter State : ";
+        cout << "Enter State: ";
         cin >> state;
         cout << "Enter ZIP Code: ";
         cin >> zip;
@@ -63,89 +60,102 @@ public:
 };
 
 class AddressBook {
-public :
+public:
     list<Contacts> contacts;
 
-public:
-    void operator+ (Contacts &c) {
+    void addContact(const Contacts& c) {
         contacts.push_back(c);
     }
 
     void display() {
-        if(contacts.empty()){
-            cout << "List is empty" << endl;
+        if (contacts.empty()) {
+            cout << "No contacts available!" << endl;
+            return;
         }
-        for(auto contact : contacts){
-            contact.display();
+        for (list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++) {
+            it->display();
+            cout << endl;
         }
     }
 
-    bool edit(string &name) {
-        for(list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++){
-            if(it->firstName == name) {
+    bool editContact(string name) {
+        for (list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++) {
+            if (it->firstName == name) {
                 cout << "Contact Found!" << endl;
-                cout << "Contact Found" << endl;
-                cout << "First Name: " << it->firstName << endl;
-                cout << "Last Name: " << it->lastName << endl;
-                cout << "Address: " << it->address << endl;
-                cout << "City: " << it->city << endl;
-                cout << "State: " << it->state << endl;
-                cout << "Zip: " << it->zip << endl;
-                cout << "Phone Number: " << it->phoneNumber << endl;
-                cout << "Email: " << it->email << endl;
-
-                cout << "Enter new Details : " << endl;
+                it->display();
+                cout << endl;
+                cout << "Enter new details: ";
                 it->input();
                 cout << "Contact Updated!" << endl;
-                cout << endl;
                 return true;
             }
         }
+        cout << "Contact not found!" << endl;
         return false;
     }
 
-    bool remove(string &name) {
-        for(list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++){
-            if(it->firstName == name) {
+    void removeContact(string name) {
+        for (list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++) {
+            if (it->firstName == name) {
                 contacts.erase(it);
-                return true;
+                cout << "Contact removed successfully!" << endl;
+                return;
             }
         }
-        return false;
+        cout << "Contact not found!" << endl;
     }
 };
 
 int main() {
-    cout << "Welcome to Book Address Problem" << endl;
-
-    Contacts c;
-    c.input();
-    cout << endl;
-
-    AddressBook ad;
-    ad + c;
-    ad.display();
-
-    cout << "Do you want to edit or remove the contact : (Input e to edit and r to remove the contact)" << endl;
+    AddressBook addressBook;
     char choice;
-    cin >> choice;
-    string name;
-    if(choice == 'e'){
-        cout << "String name to edit : " << endl;
-        cin >> name;
-        if(ad.edit(name)){
-            ad.display();
-        }else{
-            cout << "Contact Not Found!" << endl;
+
+    do {
+        cout << "Welcome to the Address Book!" << endl;
+        cout << "1. Add Contact" << endl;
+        cout << "2. Display All Contacts" << endl;
+        cout << "3. Edit Contact" << endl;
+        cout << "4. Remove Contact" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Please choose an option (1-5): ";
+        cin >> choice;
+
+        switch (choice) {
+        case '1': {
+            Contacts newContact;
+            newContact.input();
+            addressBook.addContact(newContact);
+            cout << "Contact added successfully!" << endl;
+            break;
         }
-    }
-    else if(choice == 'r') {
-        cout << "Enter name to delete the contact : " << endl;
-        cin >> name;
-        if (ad.remove(name)) {
-            cout << "Contact Deleted!" << endl;
-        }else{
-            cout << "Contact Not Found!" << endl;
+        case '2': {
+            addressBook.display();
+            break;
         }
-    }
+        case '3': {
+            string name;
+            cout << "Enter the first name of the contact you want to edit: ";
+            cin >> name;
+            addressBook.editContact(name);
+            break;
+        }
+        case '4': {
+            string name;
+            cout << "Enter the first name of the contact you want to remove: ";
+            cin >> name;
+            addressBook.removeContact(name);
+            break;
+        }
+        case '5':
+            cout << "Exiting Address Book" << endl;
+            break;
+        default:
+            cout << "Invalid choice! Please choose between 1-5." << endl;
+        }
+
+        cout << endl;
+
+    } while (choice != '5');
+
+    return 0;
 }

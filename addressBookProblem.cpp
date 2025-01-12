@@ -47,6 +47,7 @@ public:
         cin >> lastName;
         cout << "Enter Address : ";
         cin >> address;
+        cin.ignore();
         getline(cin, address);
         cout << "Enter City : ";
         cin >> city;
@@ -71,12 +72,15 @@ public:
     }
 
     void display() {
+        if(contacts.empty()){
+            cout << "List is empty" << endl;
+        }
         for(auto contact : contacts){
             contact.display();
         }
     }
 
-    bool edit(string name) {
+    bool edit(string &name) {
         for(list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++){
             if(it->firstName == name) {
                 cout << "Contact Found!" << endl;
@@ -96,9 +100,15 @@ public:
                 cout << endl;
                 return true;
             }
-            else{
-                cout << "Contact Not Found! Enter valid name" << endl; 
-                return false;
+        }
+        return false;
+    }
+
+    bool remove(string &name) {
+        for(list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++){
+            if(it->firstName == name) {
+                contacts.erase(it);
+                return true;
             }
         }
         return false;
@@ -116,15 +126,26 @@ int main() {
     ad + c;
     ad.display();
 
-    cout << "Do you want to edit contact : " << endl;
+    cout << "Do you want to edit or remove the contact : (Input e to edit and r to remove the contact)" << endl;
     char choice;
     cin >> choice;
-    if(choice == 'y' || choice == 'Y'){
+    string name;
+    if(choice == 'e'){
         cout << "String name to edit : " << endl;
-        string name;
         cin >> name;
         if(ad.edit(name)){
             ad.display();
+        }else{
+            cout << "Contact Not Found!" << endl;
+        }
+    }
+    else if(choice == 'r') {
+        cout << "Enter name to delete the contact : " << endl;
+        cin >> name;
+        if (ad.remove(name)) {
+            cout << "Contact Deleted!" << endl;
+        }else{
+            cout << "Contact Not Found!" << endl;
         }
     }
 }

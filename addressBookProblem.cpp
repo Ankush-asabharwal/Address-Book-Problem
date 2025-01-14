@@ -1,5 +1,7 @@
-#include<iostream>
-#include<list>
+#include <iostream>
+#include <list>
+#include <map>
+#include <string>
 
 using namespace std;
 
@@ -27,6 +29,7 @@ public:
 
     Contacts() {}
 
+public:
     void display() {
         cout << "First Name: " << firstName << endl;
         cout << "Last Name: " << lastName << endl;
@@ -83,8 +86,7 @@ public:
             if (it->firstName == name) {
                 cout << "Contact Found!" << endl;
                 it->display();
-                cout << endl;
-                cout << "Enter new details: ";
+                cout << "Enter new details for the contact:\n";
                 it->input();
                 cout << "Contact Updated!" << endl;
                 return true;
@@ -94,68 +96,136 @@ public:
         return false;
     }
 
-    void removeContact(string name) {
+    bool removeContact(string name) {
         for (list<Contacts>::iterator it = contacts.begin(); it != contacts.end(); it++) {
             if (it->firstName == name) {
                 contacts.erase(it);
-                cout << "Contact removed successfully!" << endl;
-                return;
+                return true;
             }
         }
-        cout << "Contact not found!" << endl;
+        return false;
+    }
+};
+
+class Dictionary {
+public:
+    map<string, AddressBook> addressBooks;
+
+    void addAddressBook(string name) {
+        if (addressBooks.find(name) != addressBooks.end()) {
+            cout << "The name for the address book is already occupied! Select another name." << endl;
+            return;
+        }
+        addressBooks[name] = AddressBook();
+        cout << "Address book '" << name << "' created successfully!" << endl;
+    }
+
+    AddressBook* getAddressBook(string name) {
+        if (addressBooks.find(name) != addressBooks.end()) {
+            return &addressBooks[name];
+        }
+        cout << "Address book not found!" << endl;
+        return nullptr;
+    }
+
+    void listAddressBooks() {
+        if (addressBooks.empty()) {
+            cout << "No address books available!" << endl;
+            return;
+        }
+        cout << "Available Address Books:" << endl;
+        for (auto& pair : addressBooks) {
+            cout << "- " << pair.first << endl;
+        }
     }
 };
 
 int main() {
-    AddressBook addressBook;
+    Dictionary dict;
     char choice;
+    string bookName;
+    string name;
 
     do {
-        cout << "Welcome to the Address Book!" << endl;
-        cout << "1. Add Contact" << endl;
-        cout << "2. Display All Contacts" << endl;
-        cout << "3. Edit Contact" << endl;
-        cout << "4. Remove Contact" << endl;
-        cout << "5. Exit" << endl;
-        cout << "Please choose an option (1-5): ";
+        cout << "\nWelcome to the Address Book Manager\n";
+        cout << "Options:\n";
+        cout << "1. Create a new address book\n";
+        cout << "2. Select an address book\n";
+        cout << "3. Quit\n";
+        cout << "Enter your choice: ";
         cin >> choice;
 
         switch (choice) {
         case '1': {
-            Contacts newContact;
-            newContact.input();
-            addressBook.addContact(newContact);
-            cout << "Contact added successfully!" << endl;
+            cout << "Enter a name for the new address book: ";
+            cin >> bookName;
+            dict.addAddressBook(bookName);
             break;
         }
         case '2': {
-            addressBook.display();
+            dict.listAddressBooks();
+            cout << "Enter the name of the address book to use: ";
+            cin >> bookName;
+            AddressBook* ad = dict.getAddressBook(bookName);
+            if (ad) {
+                char subChoice;
+                do {
+                    cout << "\nManaging Address Book: " << bookName << "\n";
+                    cout << "Options:\n";
+                    cout << "a. Add contact\n";
+                    cout << "e. Edit contact\n";
+                    cout << "r. Remove contact\n";
+                    cout << "d. Display contacts\n";
+                    cout << "q. Back to main menu\n";
+                    cout << "Enter your choice: ";
+                    cin >> subChoice;
+
+                    switch (subChoice) {
+                    case 'a': {
+                        Contacts c;
+                        c.input();
+                        ad->addContact(c);
+                        break;
+                    }
+                    case 'e': {
+                        cout << "Enter the first name of the contact to edit: ";
+                        cin >> name;
+                        ad->editContact(name);
+                        break;
+                    }
+                    case 'r': {
+                        cout << "Enter the first name of the contact to remove: ";
+                        cin >> name;
+                        if (ad->removeContact(name)) {
+                            cout << "Contact deleted!" << endl;
+                        } else {
+                            cout << "Contact not found!" << endl;
+                        }
+                        break;
+                    }
+                    case 'd': {
+                        ad->display();
+                        break;
+                    }
+                    case 'q': {
+                        cout << "Returning to main menu...\n";
+                        break;
+                    }
+                    default:
+                        cout << "Invalid choice! Please choose a valid option.\n";
+                    }
+                } while (subChoice != 'q');
+            }
             break;
         }
         case '3': {
-            string name;
-            cout << "Enter the first name of the contact you want to edit: ";
-            cin >> name;
-            addressBook.editContact(name);
+            cout << "Exiting the program...\n";
             break;
         }
-        case '4': {
-            string name;
-            cout << "Enter the first name of the contact you want to remove: ";
-            cin >> name;
-            addressBook.removeContact(name);
-            break;
-        }
-        case '5':
-            cout << "Exiting Address Book" << endl;
-            break;
         default:
-            cout << "Invalid choice! Please choose between 1-5." << endl;
+            cout << "Invalid choice! Please choose a valid option.\n";
         }
-
-        cout << endl;
-
-    } while (choice != '5');
+    } while (choice != '3');
 
     return 0;
 }
